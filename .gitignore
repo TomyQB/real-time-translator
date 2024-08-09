@@ -1,6 +1,6 @@
 # Project
 config/*.cfg
-config/*.ini*
+config/*.ini
 .idea
 
 src/__pycache__
