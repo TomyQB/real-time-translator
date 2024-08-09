@@ -1,6 +1,5 @@
 import logging
 from concurrent.futures import ThreadPoolExecutor
-
 from speech_recognition import Recognizer, Microphone
 from mtranslate import translate
 import pyttsx3
@@ -20,7 +19,8 @@ class Translator:
     def _setup_engine(self):
         voices = self.engine.getProperty("voices")
         if voices:
-            # Intenta encontrar una voz en inglés
+
+            # TODO: FIX typeof(voices) check with instanceof() and before iter
             selected_voice = next((voice.id for voice in voices if 'en' in voice.languages), None)
             self.engine.setProperty("voice", selected_voice if selected_voice else voices[0].id)
         else:
@@ -32,7 +32,7 @@ class Translator:
             self.recognizer.energy_threshold = 300  # Ajusta el umbral de energía
             self.recognizer.dynamic_energy_threshold = True  # Ajuste dinámico del umbral de energía
         except OSError as e:
-            self.logger.error("No Audio Device Available or Incompatible: %s", str(e))
+            self.logger.error(f"No Audio Device Available or Incompatible: {e}")
             exit(0)
 
     def trans3(self, string, lan):
@@ -42,7 +42,7 @@ class Translator:
             return self.translation_cache[string]
         except Exception as e:
             self.logger.error(f"Translation error: {e}")
-            return string  # Devuelve el texto original si falla la traducción
+            return string
 
     def play(self, translated_text):
         self.engine.say(translated_text)
@@ -53,6 +53,7 @@ class Translator:
         for sentence in sentences:
             self.play(sentence)
 
+    # TODO: RECOGNIZE NOT WORKING IN REALTIME DELAY 0.5 HARDCODE
     def recognize_and_translate(self, recognizer, audio):
         try:
             text = recognizer.recognize_google(audio, language="es-ES")
@@ -63,6 +64,7 @@ class Translator:
         except Exception as e:
             self.logger.error(f"Error: {e}")
 
+    # TODO: FIX EXECUTOR MULTIPLE INSTANCE NOT WORKING
     def listen(self):
         while True:
             with self.microphone as source:
