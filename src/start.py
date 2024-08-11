@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 from time import monotonic
-from multiprocessing import freeze_support
+from multiprocessing import Process, Queue, freeze_support
 from tendo.singleton import SingleInstance, SingleInstanceException
 
 # FILES
@@ -28,7 +28,21 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser(description="")
         if config_args(parser):
             args = parser.parse_args()
-        exit_code = run_main(args, logger, config)
+
+        audio_queue = Queue()
+        speech_recognizer_process = Process(target=run_main, args=(args, logger, config, audio_queue, "speech_recognizer"))
+        print("Iniciando proceso de speech_recognizer...")
+
+        transcriptor_process = Process(target=run_main, args=(args, logger, config, audio_queue, "transcriptor"))
+        print("Iniciando proceso de transcriptor...")
+
+        speech_recognizer_process.start()
+        transcriptor_process.start()
+
+        speech_recognizer_process.join()
+        transcriptor_process.join()
+
+        # exit_code = run_main(args, logger, config)
     except (KeyboardInterrupt, SystemExit):
         logger.error("Ctrl+C or SystemExit")
     except SingleInstanceException:

@@ -1,23 +1,36 @@
 import argparse
 import configparser
 import logging
-from multiprocessing import freeze_support
+from multiprocessing import Queue
 
 # PROJECT FILES
 from src.engine.translator import Translator
-
+from src.engine.speech_recognizer import SpeechRecognizer
+from src.engine.transcriptor import Transcriptor
 
 def config_args(parser):
     parser.add_argument('--name', action="store", required=False, type=str, help="test parameter")
     return True
 
+def run_main(args: argparse.Namespace, logger: logging.Logger, config: configparser.ConfigParser, audio_queue: Queue, processType) -> int:
+    if not logger.hasHandlers():
+        logger = logging.getLogger(processType)
+        logger.setLevel(logging.INFO)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+    
+    logger.info(f"Proceso iniciado: {processType}")
+    
+    if processType == "speech_recognizer":
+        logger.info("Inicializando SpeechRecognizer...")
+        speechReconizer = SpeechRecognizer(logger, audio_queue)
+        speechReconizer.listen()
 
-def run_main(args: argparse.Namespace, logger: logging.Logger, config: configparser.ConfigParser) -> int:
-    # Instantiate tools translator
-    translator = Translator(logger=logger)
-    if translator.recognizer and translator.microphone:
-        # Start listening with the recognizer
-        translator.listen()
+    elif processType == "transcriptor":
+        logger.info("Inicializando Transcriptor...")
+        transcriptor = Transcriptor(logger, audio_queue)
+        transcriptor.transcribe()
+
     return 0
-
-
