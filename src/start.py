@@ -2,7 +2,6 @@ import argparse
 import os
 import sys
 from time import monotonic
-from multiprocessing import freeze_support
 from tendo.singleton import SingleInstance, SingleInstanceException
 
 # FILES
