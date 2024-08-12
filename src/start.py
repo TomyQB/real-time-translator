@@ -31,10 +31,7 @@ if __name__ == "__main__":
 
         audio_queue = Queue()
         speech_recognizer_process = Process(target=run_main, args=(args, logger, config, audio_queue, "speech_recognizer"))
-        print("Iniciando proceso de speech_recognizer...")
-
         transcriptor_process = Process(target=run_main, args=(args, logger, config, audio_queue, "transcriptor"))
-        print("Iniciando proceso de transcriptor...")
 
         speech_recognizer_process.start()
         transcriptor_process.start()

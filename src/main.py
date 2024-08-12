@@ -21,8 +21,6 @@ def run_main(args: argparse.Namespace, logger: logging.Logger, config: configpar
         handler.setFormatter(formatter)
         logger.addHandler(handler)
     
-    logger.info(f"Proceso iniciado: {processType}")
-    
     if processType == "speech_recognizer":
         logger.info("Inicializando SpeechRecognizer...")
         speechReconizer = SpeechRecognizer(logger, audio_queue)
