@@ -7,12 +7,14 @@ from multiprocessing import Queue
 from src.engine.translator import Translator
 from src.engine.speech_recognizer import SpeechRecognizer
 from src.engine.transcriptor import Transcriptor
+from src.engine.translator import Translator
+from src.engine.speaker import Speaker
 
 def config_args(parser):
     parser.add_argument('--name', action="store", required=False, type=str, help="test parameter")
     return True
 
-def run_main(args: argparse.Namespace, logger: logging.Logger, config: configparser.ConfigParser, audio_queue: Queue, processType) -> int:
+def run_main(args: argparse.Namespace, logger: logging.Logger, config: configparser.ConfigParser, reading_queue, writing_queue: Queue, processType) -> int:
     if not logger.hasHandlers():
         logger = logging.getLogger(processType)
         logger.setLevel(logging.INFO)
@@ -23,12 +25,22 @@ def run_main(args: argparse.Namespace, logger: logging.Logger, config: configpar
     
     if processType == "speech_recognizer":
         logger.info("Inicializando SpeechRecognizer...")
-        speechReconizer = SpeechRecognizer(logger, audio_queue)
+        speechReconizer = SpeechRecognizer(logger, writing_queue)
         speechReconizer.listen()
 
     elif processType == "transcriptor":
         logger.info("Inicializando Transcriptor...")
-        transcriptor = Transcriptor(logger, audio_queue)
+        transcriptor = Transcriptor(logger, reading_queue, writing_queue)
         transcriptor.transcribe()
+
+    elif processType == "translator":
+        logger.info("Inicializando Translator...")
+        transcriptor = Translator(logger, reading_queue, writing_queue)
+        transcriptor.translate()
+
+    elif processType == "speaker":
+        logger.info("Inicializando Speaker...")
+        transcriptor = Speaker(logger, reading_queue)
+        transcriptor.speak()
 
     return 0

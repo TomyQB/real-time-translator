@@ -1,18 +1,44 @@
-import logging
-from speech_recognition import Recognizer
-from multiprocessing import Queue
+import vosk
+import json
 
 class Transcriptor:
-    def __init__(self, logger, queue):
-        self.recognizer = Recognizer()
-        self.logger = logger
-        self.audio_queue = queue
 
-    # TODO: RECOGNIZE NOT WORKING IN REALTIME DELAY 0.5 HARDCODE
+    # Configuración de la grabación
+    SAMPLE_RATE = 16000  # Tasa de muestreo
+    BLOCK_SIZE = 16000    # Tamaño de los bloques de audio que se va a procesar (1 segundo)
+
+    model = vosk.Model("vosk-model-es-0.42")
+
+    def __init__(self, logger, recognize_queue, text_queue):
+        self.logger = logger
+        self.recognize_queue = recognize_queue
+        self.text_queue = text_queue
+
     def transcribe(self):
+        recognizer = vosk.KaldiRecognizer(self.model, self.SAMPLE_RATE)
+        last_result = ""  # Variable para almacenar el último resultado completo
+        last_partial = ""  # Variable para almacenar la última transcripción parcial
+        
         while True:
-            try:
-                text = self.recognizer.recognize_google(self.audio_queue.get(), language="es-ES")
-                self.logger.info(text)
-            except Exception as e:
-                self.logger.error(f"Error: {e}")
+            audio_data = self.recognize_queue.get()
+            if recognizer.AcceptWaveform(audio_data):
+                result = recognizer.Result()
+                result_dict = json.loads(result)
+                complete_result = result_dict.get("text", "").strip()
+                
+                if complete_result != last_result:
+                    last_result = complete_result  # Actualizar el último resultado completo
+                last_partial = ""  # Restablecer la transcripción parcial
+            else:
+                partial_result = recognizer.PartialResult()
+                partial_result_dict = json.loads(partial_result)
+                current_partial = partial_result_dict.get("partial", "").strip()
+
+                # Comparar la transcripción parcial actual con la última
+                if current_partial != last_partial:
+                    # Imprimir solo la nueva parte de la transcripción parcial
+                    new_words = current_partial[len(last_partial):].strip()
+                    if new_words:
+                        self.logger.info(new_words)
+                    last_partial = current_partial  # Actualizar la última transcripción parcial
+                    self.text_queue.put(new_words)

@@ -96,3 +96,6 @@ fabric.properties
 .vscode
 .gitignore
 data/.gitkeep
+
+# vosk-model
+vosk-model-es-0.42
