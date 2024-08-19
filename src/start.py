@@ -31,20 +31,24 @@ if __name__ == "__main__":
         recognize_queue = Queue()
         text_queue = Queue()
         translated_text_queue = Queue()
+        audio_name_queue = Queue()
 
         speech_recognizer_process = Process(target=run_main, args=(args, logger, config, None, recognize_queue, "speech_recognizer"))
         transcriptor_process = Process(target=run_main, args=(args, logger, config, recognize_queue, text_queue, "transcriptor"))
         translator_process = Process(target=run_main, args=(args, logger, config, text_queue, translated_text_queue, "translator"))
-        speaker_process = Process(target=run_main, args=(args, logger, config, translated_text_queue, None, "speaker"))
+        audio_generator_process = Process(target=run_main, args=(args, logger, config, translated_text_queue, audio_name_queue, "audio_generator"))
+        speaker_process = Process(target=run_main, args=(args, logger, config, audio_name_queue, None, "speaker"))
 
         speech_recognizer_process.start()
         transcriptor_process.start()
         translator_process.start()
+        audio_generator_process.start()
         speaker_process.start()
 
         speech_recognizer_process.join()
         transcriptor_process.join()
         translator_process.join()
+        audio_generator_process.join()
         speaker_process.join()
 
     except (KeyboardInterrupt, SystemExit):

@@ -2,12 +2,14 @@ import argparse
 import configparser
 import logging
 from multiprocessing import Queue
+import asyncio
 
 # PROJECT FILES
 from src.engine.translator import Translator
 from src.engine.speech_recognizer import SpeechRecognizer
 from src.engine.transcriptor import Transcriptor
 from src.engine.translator import Translator
+from src.engine.audio_generator import AudioGenerator
 from src.engine.speaker import Speaker
 
 def config_args(parser):
@@ -38,9 +40,14 @@ def run_main(args: argparse.Namespace, logger: logging.Logger, config: configpar
         translator = Translator(logger, reading_queue, writing_queue)
         translator.translate()
 
+    elif processType == "audio_generator":
+        logger.info("icializando AudioGenerator...")
+        audioGenerator = AudioGenerator(logger, reading_queue, writing_queue)
+        asyncio.run(audioGenerator.generate())
+
     elif processType == "speaker":
         logger.info("Inicializando Speaker...")
         speaker = Speaker(logger, reading_queue)
-        speaker.speak()
+        asyncio.run(speaker.speak())
 
     return 0
