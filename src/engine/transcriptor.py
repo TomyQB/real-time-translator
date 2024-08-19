@@ -3,11 +3,9 @@ import json
 
 class Transcriptor:
 
-    # Configuración de la grabación
     SAMPLE_RATE = 16000  # Tasa de muestreo
-    BLOCK_SIZE = 16000    # Tamaño de los bloques de audio que se va a procesar (1 segundo)
 
-    model = vosk.Model("vosk-model-es-0.42")
+    model = vosk.Model("vosk-model-small-es-0.42")
 
     def __init__(self, logger, recognize_queue, text_queue):
         self.logger = logger
@@ -40,5 +38,5 @@ class Transcriptor:
                     new_words = current_partial[len(last_partial):].strip()
                     if new_words:
                         self.logger.info(new_words)
+                        self.text_queue.put(new_words)
                     last_partial = current_partial  # Actualizar la última transcripción parcial
-                    self.text_queue.put(new_words)

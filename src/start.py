@@ -32,10 +32,10 @@ if __name__ == "__main__":
         text_queue = Queue()
         translated_text_queue = Queue()
 
-        speech_recognizer_process = Process(target=run_main, args=(args, logger, config, None, recognize_queue, "speech_recognizer", init))
-        transcriptor_process = Process(target=run_main, args=(args, logger, config, recognize_queue, text_queue, "transcriptor", init))
-        translator_process = Process(target=run_main, args=(args, logger, config, text_queue, translated_text_queue, "translator", init))
-        speaker_process = Process(target=run_main, args=(args, logger, config, translated_text_queue, None, "speaker", init))
+        speech_recognizer_process = Process(target=run_main, args=(args, logger, config, None, recognize_queue, "speech_recognizer"))
+        transcriptor_process = Process(target=run_main, args=(args, logger, config, recognize_queue, text_queue, "transcriptor"))
+        translator_process = Process(target=run_main, args=(args, logger, config, text_queue, translated_text_queue, "translator"))
+        speaker_process = Process(target=run_main, args=(args, logger, config, translated_text_queue, None, "speaker"))
 
         speech_recognizer_process.start()
         transcriptor_process.start()

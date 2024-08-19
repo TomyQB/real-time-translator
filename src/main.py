@@ -35,12 +35,12 @@ def run_main(args: argparse.Namespace, logger: logging.Logger, config: configpar
 
     elif processType == "translator":
         logger.info("Inicializando Translator...")
-        transcriptor = Translator(logger, reading_queue, writing_queue)
-        transcriptor.translate()
+        translator = Translator(logger, reading_queue, writing_queue)
+        translator.translate()
 
     elif processType == "speaker":
         logger.info("Inicializando Speaker...")
-        transcriptor = Speaker(logger, reading_queue)
-        transcriptor.speak()
+        speaker = Speaker(logger, reading_queue)
+        speaker.speak()
 
     return 0

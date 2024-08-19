@@ -4,7 +4,7 @@ class SpeechRecognizer:
 
     # Configuración de la grabación
     SAMPLE_RATE = 16000  # Vosk requiere una tasa de muestreo de 16000 Hz
-    BLOCK_SIZE = 16000    # Tamaño de los bloques de audio que se procesarán (0.5 segundos)
+    BLOCK_SIZE = 16000 * 2    # Tamaño de los bloques de audio que se procesarán (2 segundos)
 
     def __init__(self, logger, queue):
         self.logger = logger

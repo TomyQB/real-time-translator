@@ -97,5 +97,6 @@ fabric.properties
 .gitignore
 data/.gitkeep
 
-# vosk-model
+# vosk-
 vosk-model-es-0.42
+vosk-model-small-es-0.42
