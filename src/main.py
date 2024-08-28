@@ -10,6 +10,7 @@ from src.engine.speech_recognizer import SpeechRecognizer
 from src.engine.transcriptor import Transcriptor
 from src.engine.translator import Translator
 from src.engine.audio_generator import AudioGenerator
+from src.engine.audio_editor import AudioEditor
 from src.engine.speaker import Speaker
 
 def config_args(parser):
@@ -44,6 +45,11 @@ def run_main(args: argparse.Namespace, logger: logging.Logger, config: configpar
         logger.info("icializando AudioGenerator...")
         audioGenerator = AudioGenerator(logger, reading_queue, writing_queue)
         asyncio.run(audioGenerator.generate())
+
+    elif processType == "audio_editor":
+        logger.info("Inicializando AudioEditor...")
+        audioEditor = AudioEditor(logger, reading_queue, writing_queue)
+        audioEditor.edit_audio()
 
     elif processType == "speaker":
         logger.info("Inicializando Speaker...")
